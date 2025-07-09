@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: ankane/pgvector
+    container_name: postgres_pgvector
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: your_user
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U your_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

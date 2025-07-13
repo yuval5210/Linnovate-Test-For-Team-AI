@@ -1,0 +1,16 @@
+{
+    "name": "Video Processor",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "video_processor",
+    "workspaceFolder": "/app",
+    "shutdownAction": "none",
+    "overrideCommand": true,
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.debugpy"
+            ]
+        }
+    }
+}

@@ -1,4 +1,4 @@
-version: '3.9'
+# version: '3.9'
 
 services:
   postgres:
@@ -8,16 +8,90 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: your_user
-      POSTGRES_PASSWORD: your_password
-      POSTGRES_DB: your_database
+      POSTGRES_USER: yuval_cohen
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: video_highlights
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./shared/database/init_databases.sql:/docker-entrypoint-initdb.d/01-init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U your_user"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - video_processor_network
+
+  # Video processor application
+  video_processor:
+    build:
+      context: ./video_processor
+      dockerfile: Dockerfile
+    container_name: video_processor_app
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AUTO_PROCESS=true
+      - FRAME_EXTRACTION_INTERVAL=5
+      - AUDIO_SEGMENT_DURATION=10
+      - IMPORTANCE_THRESHOLD=0.6
+      - MAX_FRAME_WIDTH=1280
+      - SEARCH_SIMILARITY_THRESHOLD=0.5
+    volumes:
+      - ./videos:/app/videos:ro
+      - ./shared:/app/shared:ro
+    command: python main.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - video_processor_network
+    stdin_open: true
+    tty: true
+    restart: "no" # unless-stopped
+
+  chat_api:
+    build: 
+      context: ./chat_system/backend
+      dockerfile: Dockerfile
+    container_name: chat_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      video_processor:
+        condition: service_completed_successfully
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./shared:/app/shared:ro
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - API_PORT=8000
+    networks:
+      - video_processor_network
+
+  # Step 2: Frontend
+  frontend:
+    build: 
+      context: ./chat_system/frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - chat_api
+    environment:
+      - API_URL=http://chat-api:8000
+    volumes:
+      - ./chat_system/frontend/index.html:/usr/share/nginx/html/index.html
+    networks:
+      - video_processor_network
 
 volumes:
   postgres_data:
+    # driver: local
+
+networks:
+  video_processor_network:
+    driver: bridge

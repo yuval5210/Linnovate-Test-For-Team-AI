@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: video_highlights_postgres_step1
+    restart: always
+    environment:
+      POSTGRES_DB: video_highlights
+      POSTGRES_USER: yuval_cohen
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_step1:/var/lib/postgresql/data
+      - ./shared/database/init_databases.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - video_highlights_step1
+
+  video_processor_demo:
+    build: 
+      context: ./video_processor
+      dockerfile: Dockerfile
+    container_name: video_processor_demo
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./videos:/app/videos:ro
+      - ./shared:/app/shared:ro
+    environment:
+      - DATABASE_URL=postgresql://yuval_cohen:password@postgres:5432/video_highlights
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AUTO_PROCESS=false
+    command: tail -f /dev/null
+    networks:
+      - video_highlights_step1
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data_step1:
+
+networks:
+  video_highlights_step1:
+    driver: bridge

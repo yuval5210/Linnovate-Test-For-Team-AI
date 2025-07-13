@@ -1,0 +1,27 @@
+# FastAPI and web framework dependencies
+fastapi==0.104.*
+uvicorn[standard]==0.24.*
+python-multipart==0.0.6
+
+# Database dependencies
+psycopg2-binary==2.9.*
+pgvector==0.2.*
+
+# Data validation and serialization
+pydantic==2.5.*
+
+# Google AI dependencies
+google-generativeai==0.3.*
+
+# HTTP client for API calls
+httpx==0.25.*
+requests==2.31.*
+
+# Async support
+asyncio-mqtt==0.11.*
+
+# Logging and utilities
+python-json-logger==2.0.*
+
+# CORS middleware
+fastapi-cors==0.0.6

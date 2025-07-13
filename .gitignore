@@ -1,0 +1,66 @@
+# Environment files - NEVER commit these!
+.env
+.env.local
+.env.production
+.env.staging
+
+# API Keys and secrets
+*.key
+secrets/
+
+# Database files
+*.db
+*.sqlite
+
+# Temporary files
+/tmp/
+temp/
+.tmp/
+
+# Docker volumes
+postgres_data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

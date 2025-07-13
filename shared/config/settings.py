@@ -13,10 +13,10 @@ class Settings:
     
     # Video Processing (Step 1)
     video_input_dir: str = os.getenv("VIDEO_INPUT_DIR", "./videos")
-    frame_interval: int = int(os.getenv("FRAME_INTERVAL", "5"))  # seconds
+    frame_interval: int = int(os.getenv("FRAME_INTERVAL", "5"))
     importance_threshold: float = float(os.getenv("IMPORTANCE_THRESHOLD", "0.6"))
-    max_video_duration: int = int(os.getenv("MAX_VIDEO_DURATION", "90"))  # 1.5 minutes max
-    slience_duration: float = float(os.getenv("SILENCE_DURATION", "1.0"))  # seconds
+    max_video_duration: int = int(os.getenv("MAX_VIDEO_DURATION", "90"))
+    slience_duration: float = float(os.getenv("SILENCE_DURATION", "1.0"))
     
     # Chat System (Step 2)
     api_port: int = int(os.getenv("API_PORT", "8000"))

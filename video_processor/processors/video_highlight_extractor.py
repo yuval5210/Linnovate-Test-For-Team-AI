@@ -12,6 +12,11 @@ from database.database_manager import DatabaseManager
 sys.path.append(str(Path(__file__).parent.parent))
 from shared.config.settings import Settings
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 
@@ -31,16 +36,7 @@ class VideoHighlightExtractor:
         
 
     def process_video(self, video_path: str, video_name: Optional[str] = None) -> str:
-        """
-        Process a video file and extract highlights
-        
-        Args:
-            video_path: Path to the video file
-            video_name: Optional name for the video
-            
-        Returns:
-            video_id: ID of the processed video in database
-        """
+        """Process a video file and extract highlights"""
         try:
             logger.info(f"Starting video processing for: {video_path}")
             

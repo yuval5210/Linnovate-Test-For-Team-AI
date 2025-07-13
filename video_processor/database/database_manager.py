@@ -1,20 +1,20 @@
 import psycopg2
 import psycopg2.extras
 from typing import List, Dict, Optional
-import logging
+import logging, sys
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
+
 
 class DatabaseManager:
     """Manages PostgreSQL database operations with pgvector support"""
     
     def __init__(self, database_url: str):
-        """
-        Initialize database manager
-        
-        Args:
-            database_url: PostgreSQL connection URL
-        """
         self.database_url = database_url
         self.connection = None
         self.connect()
@@ -82,18 +82,7 @@ class DatabaseManager:
     
     def create_video_record(self, filename: str, duration: float, 
                           fps: float, resolution: str) -> str:
-        """
-        Create a new video record
-        
-        Args:
-            filename: Video filename
-            duration: Video duration in seconds
-            fps: Frames per second
-            resolution: Video resolution (e.g., "1920x1080")
-            
-        Returns:
-            Video ID
-        """
+        """Create a new video record"""
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("""
@@ -128,21 +117,7 @@ class DatabaseManager:
                         importance_score: float = 0.0, 
                         category: str = 'OTHER',
                         keywords: List[str] = None) -> str:
-        """
-        Create a new highlight record
-        
-        Args:
-            video_id: Video ID
-            timestamp: Timestamp in seconds
-            description: Highlight description
-            embedding: Embedding vector
-            importance_score: Importance score (0-1)
-            category: Category label
-            keywords: List of keywords
-            
-        Returns:
-            Highlight ID
-        """
+        """Create a new highlight record"""
         try:
             with self.connection.cursor() as cursor:
                 embedding_vector = str(embedding) if embedding else None
@@ -166,16 +141,7 @@ class DatabaseManager:
     
 
     def get_video_highlights(self, video_id: str, limit: int = 100) -> List[Dict]:
-        """
-        Get all highlights for a video
-        
-        Args:
-            video_id: Video ID
-            limit: Maximum number of highlights to return
-            
-        Returns:
-            List of highlight dictionaries
-        """
+        """Get all highlights for a video"""
         try:
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
@@ -199,17 +165,7 @@ class DatabaseManager:
     def search_similar_highlights(self, query_embedding: List[float], 
                                 limit: int = 10, 
                                 min_similarity: float = 0.5) -> List[Dict]:
-        """
-        Search for similar highlights using vector similarity
-        
-        Args:
-            query_embedding: Query embedding vector
-            limit: Maximum number of results
-            min_similarity: Minimum similarity threshold
-            
-        Returns:
-            List of similar highlights with similarity scores
-        """
+        """Search for similar highlights using vector similarity"""
         try:
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
@@ -233,15 +189,7 @@ class DatabaseManager:
     
 
     def get_top_highlights(self, limit: int = 20) -> List[Dict]:
-        """
-        Get top highlights by importance score
-        
-        Args:
-            limit: Maximum number of highlights to return
-            
-        Returns:
-            List of top highlights
-        """
+        """Get top highlights by importance score"""
         try:
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
@@ -262,16 +210,7 @@ class DatabaseManager:
     
     
     def get_highlights_by_category(self, category: str, limit: int = 50) -> List[Dict]:
-        """
-        Get highlights by category
-        
-        Args:
-            category: Category name
-            limit: Maximum number of highlights
-            
-        Returns:
-            List of highlights in the category
-        """
+        """Get highlights by category """
         try:
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
@@ -337,13 +276,7 @@ class DatabaseManager:
     
 
     def update_video_summary(self, video_id: str, summary: str):
-        """
-        Update video summary
-        
-        Args:
-            video_id: Video ID
-            summary: Video summary text
-        """
+        """Update video summary"""
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("""
@@ -358,15 +291,7 @@ class DatabaseManager:
     
 
     def get_video_stats(self, video_id: str) -> Dict:
-        """
-        Get statistics for a video
-        
-        Args:
-            video_id: Video ID
-            
-        Returns:
-            Dictionary with video statistics
-        """
+        """Get statistics for a video"""
         try:
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
@@ -398,12 +323,7 @@ class DatabaseManager:
     
 
     def delete_video(self, video_id: str):
-        """
-        Delete a video and all its highlights
-        
-        Args:
-            video_id: Video ID
-        """
+        """Delete a video and all its highlights"""
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("DELETE FROM videos WHERE id = %s;", (video_id,))

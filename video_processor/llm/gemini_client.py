@@ -3,22 +3,23 @@ import json
 import re
 import random
 import google.generativeai as genai
-import logging
+import logging, sys
 from typing import List, Dict
 from PIL import Image
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
+
 
 class GeminiClient:   
     def __init__(self, api_key: str):
-        """
-        Initialize Gemini client
-        
-        Args:
-            api_key: Google AI Studio API key
-        """
+        """Initialize Gemini client"""
         if not api_key:
             raise ValueError("GEMINI_API_KEY is required")
         
@@ -135,9 +136,7 @@ class GeminiClient:
 
     def generate_highlight_description(self, image_path: str, 
                                      audio_text: str, timestamp: float) -> dict:
-        """
-        Generate comprehensive highlight description combining visual and audio
-        """
+        """Generate comprehensive highlight description combining visual and audio"""
         try:
             try:
                 self._check_and_manage_quota()
@@ -256,15 +255,7 @@ class GeminiClient:
     
 
     def generate_embedding(self, text: str) -> List[float]:
-        """
-        Generate embedding for text using Gemini
-        
-        Args:
-            text: Text to embed
-            
-        Returns:
-            Embedding vector
-        """
+        """Generate embedding for text using Gemini"""
         try:
             if not text or not text.strip():
                 # Return zero vector for empty text
@@ -289,15 +280,7 @@ class GeminiClient:
     
 
     def summarize_video_content(self, highlights: List[Dict]) -> str:
-        """
-        Generate a summary of video content based on highlights
-        
-        Args:
-            highlights: List of highlight dictionaries
-            
-        Returns:
-            Video content summary
-        """
+        """Generate a summary of video content based on highlights"""
         try:
             if not highlights:
                 return "No highlights found in video"

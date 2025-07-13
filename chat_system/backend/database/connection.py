@@ -2,8 +2,13 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from pgvector.psycopg2 import register_vector
 from typing import Optional
-import logging
+import logging, sys
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 class DatabaseConnection:

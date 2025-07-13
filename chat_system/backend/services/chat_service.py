@@ -10,6 +10,11 @@ from services.highlight_service import HighlightService
 sys.path.append(str(Path(__file__).parent.parent))
 from shared.config.settings import Settings
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
 logger = logging.getLogger(__name__)
 
 class ChatService:
@@ -251,9 +256,9 @@ class ChatService:
         avg_importance = sum(importance_scores) / len(importance_scores) if importance_scores else 0.0
 
         confidence = (
-            avg_similarity * 0.6 +          # Primary factor: how well queries match
-            result_count_factor * 0.2 +     # Secondary: number of results
-            avg_importance * 0.2             # Tertiary: quality of moments
+            avg_similarity * 0.6 + # Primary factor: how well queries match
+            result_count_factor * 0.2 + # Secondary: number of results
+            avg_importance * 0.2 # Tertiary: quality of moments
         )
         
         return max(0.0, min(1.0, round(confidence, 2)))
@@ -355,12 +360,6 @@ class ChatService:
     def suggest_questions(self, video_id: Optional[str] = None) -> List[str]:
         """
         Suggest relevant questions based on available highlights
-        
-        Args:
-            video_id: Optional video ID to get specific suggestions
-            
-        Returns:
-            List of suggested questions
         """
         try:
             if video_id:

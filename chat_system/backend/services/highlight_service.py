@@ -1,8 +1,16 @@
 from typing import List, Dict, Any, Optional
 import psycopg2.extras
 from pgvector.psycopg2 import register_vector
+import logging, sys
 
 from database.connection import DatabaseConnection
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stdout
+)
+logger = logging.getLogger(__name__)
 
 
 class HighlightService:
@@ -49,7 +57,6 @@ class HighlightService:
             
             distance_threshold = 1.0 - similarity_threshold
             params.extend([distance_threshold, limit])
-            # params.append(limit)
             
             # Execute query
             results = self.db_connection.execute_query(base_query, params)
@@ -79,8 +86,8 @@ class HighlightService:
             
         except Exception as e:
             import traceback
-            print(f"❌ VECTOR SEARCH ERROR: {str(e)}")
-            print(f"❌ TRACEBACK: {traceback.format_exc()}")
+            logger.error(f"❌ VECTOR SEARCH ERROR: {str(e)}")
+            logger.error(f"❌ TRACEBACK: {traceback.format_exc()}")
             raise Exception(f"Error searching highlights: {str(e)}")
     
 
